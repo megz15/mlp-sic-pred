@@ -20,12 +20,24 @@ X_vars = {
     "msl": "Mean Sea Level Pressure",
 }
 
+activation_fns = {
+    "Rectified Linear Unit": "relu",
+    "Hyperbolic Tangent": "tanh",
+    "Sigmoidal Function": "logistic",
+}
+
+optimization_fns = {
+    "Adam (Adaptive Moment Estimation)": "adam",
+    "Stochastic Gradient Descent": "sgd",
+    "Limited-memory BFGS": "lbfgs",
+}
+
+log("Loading dataset...")
+ds = xr.open_dataset("data_2014-2024.nc")
+
 def run_training():
     try:
         dpg.set_value("log_window", "")
-        log("Loading dataset...")
-
-        ds = xr.open_dataset("data_2014-2024.nc")
 
         selected_vars = []
         for var in X_vars.keys():
@@ -64,12 +76,12 @@ def run_training():
         X_train = scaler.fit_transform(X_train)
         X_test  = scaler.transform(X_test)
 
-        # Read parameters from GUI
+        # Read (hyper)parameters from GUI
         layers_str = dpg.get_value("lst_hidden_layers")
         hidden_layers = tuple(map(int, layers_str.split(",")))
 
-        activation = dpg.get_value("activation_combo")
-        solver = dpg.get_value("solver_combo")
+        activation = activation_fns[dpg.get_value("activation_combo")]
+        optimization = optimization_fns[dpg.get_value("optimization_combo")]
         alpha = dpg.get_value("alpha")
         max_iter = dpg.get_value("max_iters")
 
@@ -78,7 +90,7 @@ def run_training():
         model = MLPRegressor(
             hidden_layer_sizes=hidden_layers,
             activation=activation,
-            solver=solver,
+            solver=optimization,
             learning_rate_init=alpha,
             max_iter=max_iter,
             verbose=True
@@ -89,14 +101,15 @@ def run_training():
         t0 = time.time()
         model.fit(X_train, Y_train)
         log(f"Training completed in {time.time() - t0:.2f} seconds")
-        log("Number of iterations: " + str(model.n_iter_))
+        log("Number of training epochs: " + str(model.n_iter_))
         log("Final training loss: " + str(model.loss_))
 
         # Predict
         log("Running predictions...")
         pred = np.clip(model.predict(X_test), 0, 1)
         # pred = model.predict(X_test)
-        # log(f"Predictions: {pred}")
+        # log(f"First 5 predicted sea-ice conc: {pred[:5]}")
+        # log(f"First 5 actual sea-ice conc: {Y_test[:5]}")
 
         # Metrics
         rmse = np.sqrt(mean_squared_error(Y_test, pred))
@@ -112,7 +125,7 @@ def run_training():
         dpg.set_value("corr_val", f"{corr:.4f}")
 
     except BaseException as e:
-        log("ERROR:\n" + e)
+        log(f"ERROR:\n{e}")
 
 dpg.create_context()
 
@@ -125,10 +138,10 @@ with dpg.window(tag="Sea-Ice Prediction MLP"):
 
     dpg.add_separator()
 
-    dpg.add_text("Model parameters:")
+    dpg.add_text("Model (hyper)parameters:")
     dpg.add_input_text(label="Hidden layer perceptrons (comma separated)", default_value="5,5,5", tag="lst_hidden_layers")
-    dpg.add_combo(["relu", "tanh", "logistic"], label="Activation", default_value="relu", tag="activation_combo")
-    dpg.add_combo(["adam", "sgd", "lbfgs"], label="Solver", default_value="adam", tag="solver_combo")
+    dpg.add_combo(list(activation_fns.keys()), label="Activation", default_value=list(activation_fns.values())[0], tag="activation_combo")
+    dpg.add_combo(list(optimization_fns.keys()), label="Optimization", default_value=list(optimization_fns.values())[0], tag="optimization_combo")
     dpg.add_input_float(label="Learning Rate (alpha)", default_value=0.001, tag="alpha", step=0.001)
     dpg.add_input_int(label="Max Iterations", default_value=200, tag="max_iters")
 
