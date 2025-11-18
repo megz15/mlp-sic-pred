@@ -1,16 +1,29 @@
 import dearpygui.dearpygui as dpg
-import xarray as xr, numpy as np, time
+import xarray as xr, numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.impute import SimpleImputer
+import joblib, os, time, json
 
 def log(msg):
     dpg.set_value("log_window", dpg.get_value("log_window") + msg + "\n")
 
 def flatten(var):
     return var.values.reshape(len(var.valid_time), -1)
+
+def save_model(model, scaler, metadata, name):
+    if not os.path.exists("models"): os.makedirs("models")
+    if not os.path.exists("metadata"): os.makedirs("metadata")
+    if not os.path.exists("scalers"): os.makedirs("scalers")
+    
+    joblib.dump(model, f"models/{name}_model.pkl")
+    joblib.dump(scaler, f"scalers/{name}_scaler.pkl")
+    with open(f"metadata/{name}_meta.json", "w") as f:
+        json.dump(metadata, f, indent=4)
+    
+    log(f"Model, scaler and metadata saved")
 
 X_vars = {
     "sst": "Sea Surface Temperature",
@@ -20,34 +33,20 @@ X_vars = {
     "msl": "Mean Sea Level Pressure",
 }
 
-activation_fns = {
-    "Rectified Linear Unit": "relu",
-    "Hyperbolic Tangent": "tanh",
-    "Sigmoidal Function": "logistic",
-}
-
-optimization_fns = {
-    "Adam (Adaptive Moment Estimation)": "adam",
-    "Stochastic Gradient Descent": "sgd",
-    "Limited-memory BFGS": "lbfgs",
-}
-
-log("Loading dataset...")
-ds = xr.open_dataset("data_2014-2024.nc")
+activation_fns = ["relu", "logistic", "tanh", "identity"]
+optimization_fns = ["adam", "sgd", "lbfgs"]
 
 def run_training():
     try:
         dpg.set_value("log_window", "")
 
-        selected_vars = []
-        for var in X_vars.keys():
-            if dpg.get_value(f"chk_{var}"):
-                selected_vars.append(var)
+        log("Loading dataset...")
+        ds = xr.open_dataset("data_2014-2024.nc")
 
+        selected_vars = [var for var in X_vars.keys() if dpg.get_value(f"chk_{var}")]
         if len(selected_vars) == 0:
             log("ERROR: Select at least one X variable.")
             return
-
         log(f"Selected variables: {selected_vars}")
 
         X_list = [flatten(ds[v]) for v in selected_vars]
@@ -77,11 +76,9 @@ def run_training():
         X_test  = scaler.transform(X_test)
 
         # Read (hyper)parameters from GUI
-        layers_str = dpg.get_value("lst_hidden_layers")
-        hidden_layers = tuple(map(int, layers_str.split(",")))
-
-        activation = activation_fns[dpg.get_value("activation_combo")]
-        optimization = optimization_fns[dpg.get_value("optimization_combo")]
+        hidden_layers = tuple(map(int, dpg.get_value("lst_hidden_layers").split(",")))
+        activation = dpg.get_value("activation_combo")
+        optimization = dpg.get_value("optimization_combo")
         alpha = dpg.get_value("alpha")
         max_iter = dpg.get_value("max_iters")
 
@@ -100,7 +97,8 @@ def run_training():
         log("Training model...")
         t0 = time.time()
         model.fit(X_train, Y_train)
-        log(f"Training completed in {time.time() - t0:.2f} seconds")
+        tf = time.time() - t0
+        log(f"Training completed in {tf:.2f} seconds")
         log("Number of training epochs: " + str(model.n_iter_))
         log("Final training loss: " + str(model.loss_))
 
@@ -124,6 +122,26 @@ def run_training():
         dpg.set_value("mae_val", f"{mae:.4f}")
         dpg.set_value("corr_val", f"{corr:.4f}")
 
+        metadata = {
+            "variables": selected_vars,
+            "hidden_layers": hidden_layers,
+            "activation": activation,
+            "solver": optimization,
+            "learning_rate": alpha,
+            "max_iter": max_iter,
+            "epochs": model.n_iter_,
+            "rmse": rmse,
+            "mae": mae,
+            "corr": corr,
+            "training_time": tf,
+            "timestamp": time.time(),
+        }
+
+        # Save model
+        model_name = f"mlp_{hidden_layers}_{activation}_{optimization}_{alpha:.4f}_{model.n_iter_}"
+        save_model(model, scaler, metadata, model_name)
+        log(f"Saved model as: {model_name}")
+
     except BaseException as e:
         log(f"ERROR:\n{e}")
 
@@ -140,8 +158,8 @@ with dpg.window(tag="Sea-Ice Prediction MLP"):
 
     dpg.add_text("Model (hyper)parameters:")
     dpg.add_input_text(label="Hidden layer perceptrons (comma separated)", default_value="5,5,5", tag="lst_hidden_layers")
-    dpg.add_combo(list(activation_fns.keys()), label="Activation", default_value=list(activation_fns.values())[0], tag="activation_combo")
-    dpg.add_combo(list(optimization_fns.keys()), label="Optimization", default_value=list(optimization_fns.values())[0], tag="optimization_combo")
+    dpg.add_combo(activation_fns, label="Activation", default_value=activation_fns[0], tag="activation_combo")
+    dpg.add_combo(optimization_fns, label="Optimization", default_value=optimization_fns[0], tag="optimization_combo")
     dpg.add_input_float(label="Learning Rate (alpha)", default_value=0.001, tag="alpha", step=0.001)
     dpg.add_input_int(label="Max Iterations", default_value=200, tag="max_iters")
 

@@ -1,1 +1,4 @@
 *.nc
+models/*
+scalers/*
+metadata/*
