@@ -1,12 +1,9 @@
 \documentclass[12pt, a4paper]{article}
-\usepackage{amsmath, amssymb}
 \usepackage{hyperref}
 \usepackage[margin=1in]{geometry}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
-\usepackage{matlab-prettifier}
-\usepackage{subcaption}
-\usepackage{float}
+\usepackage{pythonhighlight}
 
 \hypersetup{
     colorlinks,
@@ -71,7 +68,7 @@
 
 	\newpage
 	\begin{abstract}
-		This project uses feedforward Multi-Layer Perceptron (MLP) Neural Network models for forecasting Sea-Ice concentration (SIC) using meteorological variables derived from ERA5 reanalysis: sea-surface temperature (SST), 2m air temperature (T2M), 10m u and v wind components (U10, V10) and mean sea-level pressure (MSL). The MLP models are trained using various combinations of input variables and model hyperparameters. The performance of the models is evaluated using statistical metrics such as Root Mean Square Error (RMSE), Mean Absolute Error (MAE), and Coefficient of Determination ($R\textsuperscript{2}$). This project highlights the potential of MLP Neural Networks in accurately predicting SIC, which is crucial for understanding climate dynamics all over the world.
+		This project uses feedforward Multi-Layer Perceptron (MLP) Neural Network models for forecasting Sea-Ice concentration (SIC) using meteorological variables derived from ERA5 reanalysis: sea-surface temperature (SST), 2m air temperature (T2M), 10m u and v wind components (U10, V10) and mean sea-level pressure (MSL). The MLP models are trained using various combinations of input variables and model hyperparameters. The performance of the models is evaluated using statistical metrics such as Root Mean Square Error (RMSE), Mean Absolute Error (MAE) and Coefficient of Correlation (R). This project highlights the potential of MLP Neural Networks in accurately predicting SIC, which is crucial for understanding climate dynamics all over the world.
 	\end{abstract}
 
 	\newpage
@@ -79,28 +76,30 @@
 
 	\newpage
 	\section{Introduction}
-	\subsection{Background}
-	Sea-ice plays an important role in the global climate system, influencing heat exchange, ocean circulation and weather patterns. Sea-Ice concentration in Antarctica varies seasonally, reaching its maximum in the Antarctic winter (July to September) and its minimum in the Antarctic summer (January to March). This variation is strongly influenced in non-linear ways by various meteorological variables, including temperature (SST), wind patterns (U10, V10), and atmospheric pressure (MSL). Accurate prediction of SIC is crucial for understanding climate dynamics and policy-making related to climate change.
+	Sea-ice plays an important role in the global climate system, influencing heat exchange, ocean circulation and weather patterns. Sea-Ice Concentration (SIC) in Antarctica varies seasonally, reaching its maximum in the Antarctic winter (July to September) and its minimum in the Antarctic summer (January to March). This variation is strongly influenced in non-linear ways by various meteorological variables, including temperature (SST), wind patterns (U10, V10), and atmospheric pressure (MSL). Accurate prediction of SIC is crucial for understanding climate dynamics and policy-making related to climate change \cite{kennicutt2014}.
 	\\\\ Traditional methods for predicting SIC often rely on physical models that can be computationally expensive and require extensive calibration, and may not capture the complex non-linear relationships between SIC and meteorological variables. Moreover, the accuracy of these models can be limited by the resolution and quality of input data.
-	\\\\ On the other hand, machine learning techniques, particularly neural networks, are known to capture complex patterns in data. Multi-Layer Perceptron (MLP) Neural Networks are a type of feedforward artificial neural network (ANN) that can model non-linear relationships between input and output variables. MLPs consist of multiple layers of interconnected neurons that can learn from large datasets through iterative training and optimization. Due to this, they are generally well-suited for cases where the input data is not at par with the quality or resolution required by physical models.
-	\\\\ This project aims to explore the application of MLP Neural Networks for predicting Antarctic Sea-Ice concentration using atmospheric and oceanic variables as input variables derived from ERA5 reanalysis data. The performance of the MLP models are evaluated using various statistical metrics, and the results are compared to gauge the relative effectiveness of the models.
+	\\\\ On the other hand, machine learning techniques, particularly neural networks, are known to capture complex patterns in data. Multi-Layer Perceptron (MLP) Neural Networks are a type of feedforward artificial neural network (ANN) that can model non-linear relationships between input and output variables. MLPs consist of multiple layers of interconnected neurons that can learn from large datasets through iterative training and optimization. Due to this, they are generally well-suited for cases where the input data is not at par with the quality or resolution required by physical models \cite{annatmos} \cite{annclimatechange}.
+	\\\\ This project aims to explore the application of MLP Neural Networks for predicting Antarctic sea-ice concentration using atmospheric and oceanic variables as input variables derived from ERA5 reanalysis data \cite{era5}. The performance of the MLP models are evaluated using various statistical metrics, and the results are compared to gauge the relative effectiveness of the models.
 
 	\newpage
-
+	\section{Study Area and Data}
 	\subsection{Study Area}
 	The study area for this project is the Antarctic region, specifically the Southern Ocean surrounding the continent of Antarctica. Antarctica occupies an area of about 14 million square kilometers, which is mostly covered by 29 million cubic kilometers of ice - about 90\% of the world's ice and 80\% of its fresh water.
-	\\\\ The Antarctic sea-ice cover is typically divided into five sectors: the Ross Sea, the Weddell Sea, the Indian Ocean sector, the West Pacific sector and the Bellingshausen-Amundsen Seas. Each sector exhibits distinct sea-ice characteristcs due to variations in local atmospheric and oceanic conditions.
-	\\\\ The weather in Antarctica is characterized by high-speed katabatic winds, which are created due to cold and dense air blowing downhill from the polar plateau. These winds influence formation and distribution of sea-ice in the surrounding Southern Ocean.
-	\\\\ Antarctica also experiences extreme temperature patterns due to being plunged into darkness during the Antarctic winter and experiencing continuous sunlight during the Antarctic summer. Depending on the region, temperatures in Antarctica fluctuate between -80°C in winter to 10°C in summer. Precipitation is generally low, with most of it falling as snow.
-	\\\\ Atmospheric pressure patterns in Antarctica also play a significant role in influencing sea-ice dynamics. The mainland is usually surrounded by a low-pressure belt, while the interior experiences high-pressure, creating conditions for the formation of the characteristic katabatic winds.
+	\\\\ The Antarctic sea-ice cover is typically divided into five sectors: the Ross Sea, the Weddell Sea, the Indian Ocean sector, the West Pacific sector and the Bellingshausen-Amundsen Seas. Each sector exhibits distinct sea-ice characteristcs due to variations in local atmospheric and oceanic conditions \cite{parkinson2012}.
+	\\\\ The weather in Antarctica is characterized by high-speed katabatic winds, which are created due to cold and dense air blowing downhill from the polar plateau. These winds influence formation and distribution of sea-ice in the surrounding Southern Ocean \cite{seaicedecline} \cite{schemm2018}.
+	\\\\ Antarctica also experiences extreme temperature patterns due to being plunged into darkness during the Antarctic winter and experiencing continuous sunlight during the Antarctic summer \cite{temp2}. Depending on the region, temperatures in Antarctica fluctuate between -80°C in winter to 10°C in summer \cite{temp1}. Precipitation is generally low, with most of it falling as snow.
+	\\\\ Atmospheric pressure patterns in Antarctica also play a significant role in influencing sea-ice dynamics. The mainland is usually surrounded by a low-pressure belt, while the interior experiences high-pressure, creating conditions for the formation of the characteristic katabatic winds \cite{seaicedecline}.
+	\\\\ The seasons in Antarctica are opposite to those in the Northern Hemisphere, and are categorized as follows \cite{parkinson2012}:
+	\begin{itemize}
+		\item \textbf{Summer:} January to March
+		\item \textbf{Autumn:} April to June
+		\item \textbf{Winter:} July to September
+		\item \textbf{Spring:} October to December
+	\end{itemize}
 
 	\newpage
-	\section{Literature Review}
-
-	\newpage
-	\section{Data and Methodology}
-	\subsection{Data Sources}
-	The data used in this project is taken from the ERA5 reanalysis dataset, which is maintained by the European Centre for Medium-Range Weather Forecasts (ECMWF). The dataset uses historical meteorological observations and weather prediction models to generate comprehensive data, from 1940 to the present. It has a spatial resolution of 0.25° x 0.25° and a temporal resolution of 1 hour, although a monthly frequency has been chosen for this project. This makes it suitable for studying climate patterns and trends.
+	\subsection{Data Source}
+	The data used in this project is taken from the ERA5 reanalysis dataset, which is maintained by the European Centre for Medium-Range Weather Forecasts (ECMWF) \cite{era5}. The dataset uses historical meteorological observations and weather prediction models to generate comprehensive data, from 1940 to the present. It has a spatial resolution of 0.25° x 0.25° and a temporal resolution of 1 hour, although a monthly frequency has been chosen for this project. This makes it suitable for studying climate patterns and trends.
 	\\\\ The specific variables used in this project are:
 	\begin{itemize}
 		\item Sea-Surface Temperature (SST)
@@ -109,8 +108,48 @@
 		\item 10m V Wind Component (V10)
 		\item Mean Sea-Level Pressure (MSL)
 	\end{itemize}
-	The target variable for prediction is the Sea-Ice Concentration (SIC) in the Antarctic Southern ocean region (latitude range -55° to -75°).
-	\\\\ The dataset spans a decade from January 2014 to December 2024, incorporating seasonal and inter-annual variability.
+	The target variable for prediction is the Sea-Ice Concentration (SIC) in the Antarctic Southern ocean region:
+	\begin{itemize}
+		\item North: -55°
+		\item South: -75°
+		\item West: -180°
+		\item East: 180°
+	\end{itemize}
+	The dataset spans a decade from January 2014 to December 2024, incorporating seasonal and inter-annual variability.
+
+	\newpage
+	\section{Literature Review}
+	\subsection{Sea-Ice Variability}
+	Sea-ice variability in the Antarctic region has been a subject of extensive research in recent times due to its significant impact on global climate systems \cite{var200}. Studies have shown that sea-ice extent and concentration are influenced by a combination of atmospheric and oceanic factors, including temperature, wind patterns, and ocean currents \cite{desantis2017}. For example, Parkinson and Cavalieri \cite{parkinson2012} analyzed satellite data to identify trends in Antarctic SIC, highlighting the complex relationship between natural variability and human influences.
+	\\\\ Jena et al. \cite{jena2018} investigate the mechanisms behind sea-ice expansion in the Indian Ocean sector of Antarctica, emphasizing the role of meteorological variables such as air temperature and wind patterns. Their findings suggest that changes in these variables can lead to significant variations in sea-ice concentration, signifying the need for accurate predictive models.
+
+	\subsection{Neural Networks in Climate Science}
+	Machine learning techniques, particularly neural networks, have gained prominence in climate science for their ability to model complex, non-linear relationships in large datasets. MLP Neural Networks have been successfully applied in various climate-related prediction tasks, including temperature forecasting, precipitation prediction, and sea-ice extent estimation.
+	\\\\ Gardner and Dorling \cite{annatmos} provide a comprehensive review of the applications of MLP Neural Networks in atmospheric sciences, highlighting their effectiveness in capturing non-linear patterns in atmospheric data. Similarly, Liu et al. \cite{annclimatechange} discuss the broader applications of artificial neural networks in global climate change research, emphasizing their potential in improving predictive accuracy.
+	\\\\ These studies highlight the potential of MLP Neural Networks in climate science, particularly for accurate predictions. However, there remains a need for further research to optimize model architectures and hyperparameters for specific applications, such as Antarctic SIC prediction.
+
+	\newpage
+	\section{Methods and Methodology}
+	\subsection{Tools and Software}
+	The following tools and software are used in this project:
+	\begin{itemize}
+		\item \textbf{Primary language:} Python 3.13.7 \cite{python}
+		\item \textbf{Neural network library:} scikit-learn (MLPRegressor) \cite{sklearn}
+		\item \textbf{Data handling:} xarray, NumPy
+		\item \textbf{Preprocessing:} StandardScaler, SimpleImputer
+		\item \textbf{Hyperparameter tuning:} GridSearchCV
+		\item \textbf{Model serialization:} joblib
+		\item \textbf{GUI:} DearPyGUI
+		\item \textbf{Dataset format:} NetCDF (ERA5)
+	\end{itemize}
+	All computations were performed on a Linux 6.17.8 system running Arch Linux, with multi-core CPU acceleration enabled during grid search. The Python codebase has been added to a public GitHub repository \cite{github}, as well as in the Appendix section of this report.
+	\\\\ A graphical user interface (GUI) has also been developed using DearPyGUI to enable easy and interactive experimentation with different hyperparameter configurations, without modifying the codebase directly.
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=0.8\textwidth]{gui.png}
+		\caption{Graphical User Interface for sea-ice concentration prediction}
+		\label{fig:gui}
+	\end{figure}
 
 	\subsection{Data Preprocessing}
 	In its raw form, the ERA5 dataset contains missing values, outliers and inconsistencies that need to be taken care of before training the MLP models. The following preprocessing steps are applied:
@@ -130,7 +169,7 @@
 		\item \textbf{Learning Rate:} The learning rate (alpha) controls the step size while updating the model weights during training. A suitable learning rate is chosen to ensure convergence.
 		\item \textbf{Activation Functions:} Non-linear activation functions such as Rectified Linear Unit (ReLU), Sigmoidal or Hyperbolic Tangent (TanH) are used in the hidden layers to introduce non-linearity into the model.
 		\item \textbf{Loss Function:} Mean Squared Error (MSE) is used as the loss function to measure the difference between predicted and actual SIC values during training.
-		\item \textbf{Optimization Algorithm:} The Adaptive Moment Estimation (Adam) optimizer is used to update the weights of the network during training. Other optimizers like Stochastic Gradient Descent (SGD) can also be used.
+		\item \textbf{Optimization Algorithm:} Based on the grid search results, Stochastic Gradient Descent (SGD) optimizer is used to update the weights of the network during training. Other optimizers like Adaptive Moment Estimation (Adam) can also be used.
 	\end{itemize}
 
 	\subsection{Model Training and Evaluation}
@@ -139,12 +178,12 @@
 	\begin{itemize}
 		\item Root Mean Square Error (RMSE)
 		\item Mean Absolute Error (MAE)
-		\item Coefficient of Determination ($R\textsuperscript{2}$)
+		\item Coefficient of Correlation (R)
 	\end{itemize}
-	The performance of different MLP models is compared based on the evaluation metrics using the following formula:
-	\begin{equation*}
-		\dfrac{1}{\textit{RMSE}} + \dfrac{1}{\textit{MAE}} + 10\textit{R}\textsuperscript{2}
-	\end{equation*}
+	The performance of different MLP models is also empirically compared based on the evaluation metrics using the following formula:
+	\begin{equation}
+		\frac{1}{RMSE} + \frac{1}{MAE} + 10R
+	\end{equation}
 
 	\newpage
 	\section{Results}
@@ -176,9 +215,12 @@
 	\end{itemize}
 	The performance of this model on the testing dataset is as follows:
 	\begin{itemize}
+		\item Epochs to Convergence: 51
+		\item Training Time: 30.02 seconds
+		\item Final Training Loss (MSE): 0.0345
 		\item RMSE: 0.1919
 		\item MAE: 0.1099
-		\item $R\textsuperscript{2}$: 0.8705
+		\item R: 0.8705
 	\end{itemize}
 
 	\subsection{Best Two-Layer Model}
@@ -193,15 +235,17 @@
 	\end{itemize}
 	The performance of this model on the testing dataset is as follows:
 	\begin{itemize}
+		\item Epochs to Convergence: 77
+		\item Training Time: 50.44 seconds
+		\item Final Training Loss (MSE): 0.0181
 		\item RMSE: 0.1923
 		\item MAE: 0.1050
-		\item $R\textsuperscript{2}$: 0.8690
+		\item R: 0.8690
 	\end{itemize}
 
 	\newpage
 	\section{Discussion}
-	\subsection{Analysis of Results}
-	The results obtained from the grid searches indicate that both the best one-layer and two-layer MLP models constrained in the defined hyperparameter space performed comparably well in predicting Antarctic SIC using meteorological variables. The RMSE and MAE values for both models are very similar, with the one-layer model slightly outperforming the two-layer model in terms of RMSE, while the two-layer model had a slightly better MAE. The $R\textsuperscript{2}$ values for both models are also very close, indicating that both models explain a significant portion of the variance in the SIC data.
+	The results obtained from the grid searches indicate that both the best one-layer and two-layer MLP models constrained in the defined hyperparameter space performed comparably well in predicting Antarctic SIC using meteorological variables. The RMSE and MAE values for both models are very similar, with the one-layer model slightly outperforming the two-layer model in terms of RMSE, while the two-layer model had a slightly better MAE. The R values for both models are also very close, indicating that both models explain a significant portion of the variance in the SIC data.
 	\\\\ The choice of activation function (TanH) and optimization scheme (SGD) appears to be effective for this specific problem, as both models utilized these configurations. The learning rates chosen for the best models (0.005 for one-layer and 0.001 for two-layer) also seem to have contributed positively to the training process.
 	\\\\ The marginal differences in performance metrics suggest that increasing the complexity of the model by adding an additional hidden layer did not lead to a significant improvement. Therefore, guided by the principle of parsimony, the simpler one-layer network is the preferred model, and is termed a parsimonious model. This is likely because the relationship between the input variables and SIC is not complex enough to warrant a higher dimensional network, or the additional layer led to overfitting on the training data.
 	\\\\ Overall, both models demonstrate the capability of MLP Neural Networks in capturing the non-linear relationships between input variables and the target. However, with near identical performane, the parsimonious model (the one-layer network) is preferred for the balance between simplicity and predictive accuracy for this specific application.
@@ -218,20 +262,625 @@
 	\begin{itemize}
 		\item RMSE: ~0.192
 		\item MAE: ~0.107
-		\item $R\textsuperscript{2}$: ~0.87
+		\item R: ~0.87
 	\end{itemize}
 	The results indicate that even simple networks can effectively model large-scale climate phenomena like sea-ice variability when trained on physically meaningful input variables. More complex architectures did not yield significant improvements while increasing computational costs. This highlights the importance of model parsimony in machine learning applications for climate science.
 	\\\\ Future work could explore additional input variables, longer training periods, and alternative neural network architectures like Convolutional Neural Networks (CNNs) or Recurrent Neural Networks (RNNs) to further enhance predictive capabilities. In conclusion, this project demonstrates the potential of MLP Neural Networks as a valuable tool for climate modeling and prediction tasks.
 
 	\newpage
-	\section{Bibliography}
-	\begin{itemize}
-		
-		\item Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Horányi, A., Muñoz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Thépaut, J-N. (2023). \textit{ERA5 hourly data on single levels from 1940 to present}. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). \url{https://doi.org/10.24381/cds.adbb2d47}
-		
-		\item Jena B, Kumar A, Ravichandran M, Kern S (2018). \textit{Mechanism of sea-ice expansion in the Indian Ocean sector of Antarctica: Insights from satellite observation and model reanalysis}. PLoS ONE 13(10): e0203222. \url{ https://doi.org/10.1371/journal.pone.0203222}
+	\appendix
+	\section{Python Code Used}
+	The complete Python codebase used for data preprocessing, model training, hyperparameter tuning and evaluation has also been made available on GitHub \cite{github}.
 
-		\item Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J., Passos, A., Cournapeau, D., Brucher, M., Perrot, M., Duchesnay, É. (2011). \textit{Scikit-learn: Machine Learning in Python}. Journal of Machine Learning Research, 12, 2825-2830. \url{http://jmlr.org/papers/v12/pedregosa11a.html}
+	\subsection{Base Code (main.py)}
+	\begin{python}
+import xarray as xr, numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPRegressor
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.impute import SimpleImputer
+import joblib, os, time, json
 
-	\end{itemize}
+def flatten(var):
+    return var.values.reshape(len(var.valid_time), -1)
+
+def save_model(model, scaler, metadata, name):
+    if not os.path.exists("models"): os.makedirs("models")
+    if not os.path.exists("metadata"): os.makedirs("metadata")
+    if not os.path.exists("scalers"): os.makedirs("scalers")
+    
+    joblib.dump(model, f"models/{name}_model.pkl")
+    joblib.dump(scaler, f"scalers/{name}_scaler.pkl")
+    with open(f"metadata/{name}_meta.json", "w") as f:
+        json.dump(metadata, f, indent=4)
+    
+    print(f"Model, scaler and metadata saved for {name}")
+
+X_vars = {
+    "sst": "Sea Surface Temperature",
+    "t2m": "Temperature at 2m above ground",
+    "u10": "Wind U component at 10m",
+    "v10": "Wind V component at 10m",
+    "msl": "Mean Sea Level Pressure",
+}
+
+activation_fns = ["relu", "logistic", "tanh", "identity"]
+optimization_fns = ["adam", "sgd", "lbfgs"]
+
+print("Loading dataset...")
+ds = xr.open_dataset("data_2014-2024.nc")
+ds = ds.sel(latitude=slice(-55, -75))
+
+X_vars = ["sst", "t2m", "u10", "v10", "msl"]
+X_list = [flatten(ds[v]) for v in X_vars]
+
+X = np.hstack(X_list)
+Y = flatten(ds["siconc"])
+
+# Cleaning data
+print("Cleaning up the data...")
+
+X = X[:, ~np.isnan(X).all(axis=0)]
+Y = Y[:, ~np.isnan(Y).all(axis=0)]
+
+X = SimpleImputer(strategy='mean').fit_transform(X)
+Y = np.nan_to_num(Y, nan=0.0)
+
+# Train-test split
+print("Train-test splitting...")
+
+X_train, X_test, Y_train, Y_test = train_test_split(
+    X, Y, test_size=0.3, shuffle=False
+)
+
+# Standardizing data
+print("Standardizing the data...")
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test  = scaler.transform(X_test)
+
+# MLP Model parameter ranges
+
+hidden_layers = []
+activation = activation_fns[0]
+optimization = optimization_fns[0]
+alpha = 0.001
+max_iter = 200
+
+n_layers = 1
+print('Note: Enter "done" when finished adding layers')
+
+while True:
+    range_n_neurons = input(f"Enter range of neurons in layer {n_layers}: ")
+    if range_n_neurons.lower() == "done":
+        break
+    try:
+        start, end = map(int, range_n_neurons.split(","))
+        hidden_layers.append((start, end))
+        n_layers += 1
+    except:
+        print("Invalid input. Please enter two integers separated by a comma.")
+
+print("Creating MLP model...")
+model = MLPRegressor(
+    hidden_layer_sizes=hidden_layers,
+    activation=activation,
+    solver=optimization,
+    learning_rate_init=alpha,
+    max_iter=max_iter,
+    verbose=True,
+    random_state=1869
+)
+
+# Train
+print("Training model...")
+t0 = time.time()
+model.fit(X_train, Y_train)
+tf = time.time() - t0
+print(f"Training completed in {tf:.2f} seconds")
+print("Number of training epochs: " + str(model.n_iter_))
+print("Final training loss: " + str(model.loss_))
+
+# Predict
+print("Running predictions...")
+pred = np.clip(model.predict(X_test), 0, 1)
+
+# Metrics
+rmse = np.sqrt(mean_squared_error(Y_test, pred))
+mae = mean_absolute_error(Y_test, pred)
+corr = np.corrcoef(Y_test.flatten(), pred.flatten())[0, 1]
+
+print(f"RMSE: {rmse}")
+print(f"MAE: {mae}")
+print(f"Correlation: {corr}")
+
+metadata = {
+    "variables": X_vars,
+    "hidden_layers": hidden_layers,
+    "activation": activation,
+    "solver": optimization,
+    "learning_rate": alpha,
+    "max_iter": max_iter,
+    "epochs": model.n_iter_,
+    "rmse": rmse,
+    "mae": mae,
+    "corr": corr,
+    "training_time": tf,
+    "timestamp": time.time(),
+}
+
+# Save model
+model_name = f"mlp_{hidden_layers}_{activation}_{optimization}_{alpha:.4f}_{model.n_iter_}"
+save_model(model, scaler, metadata, model_name)
+print(f"Saved model as: {model_name}")
+	\end{python}
+
+	\subsection{GUI (gui.py)}
+	\begin{python}
+import dearpygui.dearpygui as dpg
+import xarray as xr, numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPRegressor
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.impute import SimpleImputer
+import joblib, os, time, json
+
+def log(msg):
+    dpg.set_value("log_window", dpg.get_value("log_window") + msg + "\n")
+
+def flatten(var):
+    return var.values.reshape(len(var.valid_time), -1)
+
+def save_model(model, scaler, metadata, name):
+    if not os.path.exists("models"): os.makedirs("models")
+    if not os.path.exists("metadata"): os.makedirs("metadata")
+    if not os.path.exists("scalers"): os.makedirs("scalers")
+    
+    joblib.dump(model, f"models/{name}_model.pkl")
+    joblib.dump(scaler, f"scalers/{name}_scaler.pkl")
+    with open(f"metadata/{name}_meta.json", "w") as f:
+        json.dump(metadata, f, indent=4)
+    
+    log(f"Model, scaler and metadata saved")
+
+X_vars = {
+    "sst": "Sea Surface Temperature",
+    "t2m": "Temperature at 2m above ground",
+    "u10": "Wind U component at 10m",
+    "v10": "Wind V component at 10m",
+    "msl": "Mean Sea Level Pressure",
+}
+
+activation_fns = ["relu", "logistic", "tanh", "identity"]
+optimization_fns = ["adam", "sgd", "lbfgs"]
+
+def run_training():
+    try:
+        dpg.set_value("log_window", "")
+
+        log("Loading dataset...")
+        ds = xr.open_dataset("data_2014-2024.nc")
+        ds = ds.sel(latitude=slice(-55, -75))
+
+        selected_vars = [var for var in X_vars.keys() if dpg.get_value(f"chk_{var}")]
+        if len(selected_vars) == 0:
+            log("ERROR: Select at least one X variable.")
+            return
+        log(f"Selected variables: {selected_vars}")
+
+        X_list = [flatten(ds[v]) for v in selected_vars]
+        X = np.hstack(X_list)
+        Y = flatten(ds["siconc"])
+
+        log("Cleaning up the data...")
+
+        # Remove NaN columns
+        X = X[:, ~np.isnan(X).all(axis=0)]
+        Y = Y[:, ~np.isnan(Y).all(axis=0)]
+
+        # Impute and fill NaNs
+        X = SimpleImputer(strategy='mean').fit_transform(X)
+        Y = np.nan_to_num(Y, nan=0.0)
+
+        # Train-test split
+        log("Train-test splitting...")
+        X_train, X_test, Y_train, Y_test = train_test_split(
+            X, Y, test_size=dpg.get_value("ttsplit"), shuffle=False
+        )
+
+        # Standardizing
+        log("Standardizing the data...")
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test  = scaler.transform(X_test)
+
+        # Read (hyper)parameters from GUI
+        hidden_layers = tuple(map(int, dpg.get_value("lst_hidden_layers").split(",")))
+        activation = dpg.get_value("activation_combo")
+        optimization = dpg.get_value("optimization_combo")
+        alpha = dpg.get_value("alpha")
+        max_iter = dpg.get_value("max_iters")
+
+        # Create model
+        log("Creating MLP model...")
+        model = MLPRegressor(
+            hidden_layer_sizes=hidden_layers,
+            activation=activation,
+            solver=optimization,
+            learning_rate_init=alpha,
+            max_iter=max_iter,
+            verbose=True
+        )
+
+        # Train
+        log("Training model...")
+        t0 = time.time()
+        model.fit(X_train, Y_train)
+        tf = time.time() - t0
+        log(f"Training completed in {tf:.2f} seconds")
+        log("Number of training epochs: " + str(model.n_iter_))
+        log("Final training loss: " + str(model.loss_))
+
+        # Predict
+        log("Running predictions...")
+        pred = np.clip(model.predict(X_test), 0, 1)
+        # pred = model.predict(X_test)
+        # log(f"First 5 predicted sea-ice conc: {pred[:5]}")
+        # log(f"First 5 actual sea-ice conc: {Y_test[:5]}")
+
+        # Metrics
+        rmse = np.sqrt(mean_squared_error(Y_test, pred))
+        mae = mean_absolute_error(Y_test, pred)
+        corr = np.corrcoef(Y_test.flatten(), pred.flatten())[0, 1]
+
+        log(f"RMSE: {rmse}")
+        log(f"MAE: {mae}")
+        log(f"Correlation: {corr}")
+
+        dpg.set_value("rmse_val", f"{rmse:.4f}")
+        dpg.set_value("mae_val", f"{mae:.4f}")
+        dpg.set_value("corr_val", f"{corr:.4f}")
+
+        metadata = {
+            "variables": selected_vars,
+            "hidden_layers": hidden_layers,
+            "activation": activation,
+            "solver": optimization,
+            "learning_rate": alpha,
+            "max_iter": max_iter,
+            "epochs": model.n_iter_,
+            "rmse": rmse,
+            "mae": mae,
+            "corr": corr,
+            "training_time": tf,
+            "timestamp": time.time(),
+        }
+
+        # Save model
+        model_name = f"mlp_{hidden_layers}_{activation}_{optimization}_{alpha:.4f}_{model.n_iter_}"
+        save_model(model, scaler, metadata, model_name)
+        log(f"Saved model as: {model_name}")
+
+    except BaseException as e:
+        log(f"ERROR:\n{e}")
+
+dpg.create_context()
+
+with dpg.window(tag="Sea-Ice Prediction MLP"):
+    dpg.add_text("Select input variables (X):")
+    for var in X_vars.keys():
+        dpg.add_checkbox(label=X_vars[var], default_value=True, tag=f"chk_{var}")
+
+    dpg.add_input_float(label="Testing split size",default_value=0.3, tag="ttsplit")
+
+    dpg.add_separator()
+
+    dpg.add_text("Model (hyper)parameters:")
+    dpg.add_input_text(label="Hidden layer perceptrons (comma separated)", default_value="5,5,5", tag="lst_hidden_layers")
+    dpg.add_combo(activation_fns, label="Activation", default_value=activation_fns[0], tag="activation_combo")
+    dpg.add_combo(optimization_fns, label="Optimization", default_value=optimization_fns[0], tag="optimization_combo")
+    dpg.add_input_float(label="Learning Rate (alpha)", default_value=0.001, tag="alpha", step=0.001)
+    dpg.add_input_int(label="Max Iterations", default_value=200, tag="max_iters")
+
+    dpg.add_separator()
+    dpg.add_button(label="Train Model", callback=run_training)
+    dpg.add_separator()
+
+    dpg.add_text("Results:")
+    dpg.add_text("RMSE:", bullet=True); dpg.add_same_line(); dpg.add_text("", tag="rmse_val")
+    dpg.add_text("MAE:", bullet=True); dpg.add_same_line(); dpg.add_text("", tag="mae_val")
+    dpg.add_text("Correlation:", bullet=True); dpg.add_same_line(); dpg.add_text("", tag="corr_val")
+
+    dpg.add_text("Logs:")
+    dpg.add_input_text(tag="log_window", multiline=True, width=500, height=200, readonly=True)
+
+dpg.create_viewport(title="Sea-Ice Prediction MLP")
+dpg.setup_dearpygui()
+dpg.show_viewport()
+dpg.set_primary_window("Sea-Ice Prediction MLP", True)
+dpg.start_dearpygui()
+dpg.destroy_context()
+	\end{python}
+
+	\subsection{Grid Search (gridsearch.py)}
+	\begin{python}
+import xarray as xr, numpy as np, pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.neural_network import MLPRegressor
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.impute import SimpleImputer
+import joblib, os, time, json, itertools
+
+def flatten(var):
+    return var.values.reshape(len(var.valid_time), -1)
+
+def save_model(model, scaler, metadata, name):
+    if not os.path.exists("multi_models"): os.makedirs("multi_models")
+    if not os.path.exists("multi_metadata"): os.makedirs("multi_metadata")
+    if not os.path.exists("multi_scalers"): os.makedirs("multi_scalers")
+    
+    joblib.dump(model, f"multi_models/{name}_model.pkl")
+    joblib.dump(scaler, f"multi_scalers/{name}_scaler.pkl")
+    with open(f"multi_metadata/{name}_meta.json", "w") as f:
+        json.dump(metadata, f, indent=4)
+    
+    print(f"Model, scaler and metadata saved for {name}")
+
+X_vars_dict = {
+    "sst": "Sea Surface Temperature",
+    "t2m": "Temperature at 2m above ground",
+    "u10": "Wind U component at 10m",
+    "v10": "Wind V component at 10m",
+    "msl": "Mean Sea Level Pressure",
+}
+
+print("Loading dataset...")
+ds = xr.open_dataset("data_2014-2024.nc")
+ds = ds.sel(latitude=slice(-55, -75))
+
+X_vars = ["sst", "t2m", "u10", "v10", "msl"]
+X_list = [flatten(ds[v]) for v in X_vars]
+
+X = np.hstack(X_list)
+Y = flatten(ds["siconc"])
+
+# Cleaning data
+print("Cleaning up the data...")
+X = X[:, ~np.isnan(X).all(axis=0)]
+Y = Y[:, ~np.isnan(Y).all(axis=0)]
+
+X = SimpleImputer(strategy='mean').fit_transform(X)
+Y = np.nan_to_num(Y, nan=0.0)
+
+# Train-test split
+print("Train-test splitting...")
+X_train, X_test, Y_train, Y_test = train_test_split(
+    X, Y, test_size=0.3, shuffle=False
+)
+
+# Standardizing data
+print("Standardizing the data...")
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test  = scaler.transform(X_test)
+
+# Hidden Layer Neuron Ranges
+neuron_ranges = []
+n_layers = 1
+print('\n=== Layer Configuration ===')
+print('Enter ranges (e.g., "4,8") to test all sizes between 4 and 8.')
+print('Type "done" when you have defined all layers.')
+
+while True:
+    range_input = input(f"Enter range for Layer {n_layers} (start,end): ")
+    if range_input.lower() == "done":
+        break
+    try:
+        start, end = map(int, range_input.split(","))
+        neuron_ranges.append(range(start, end + 1))
+        n_layers += 1
+    except ValueError:
+        print("Invalid input. Please enter two integers separated by a comma (e.g., 4,8).")
+
+hidden_layer_combinations = list(itertools.product(*neuron_ranges))
+
+print(f"\nGenerated {len(hidden_layer_combinations)} combinations to test.")
+
+# Parameter Grid
+param_grid = {
+    'hidden_layer_sizes': hidden_layer_combinations,
+    'activation': ["relu", "tanh", "logistic"],
+    'solver': ["adam", "sgd"], # , "lbfgs"
+    'learning_rate_init': [0.001, 0.005, 0.01],
+    'max_iter': [200]
+}
+
+print("\nStarting Grid Search...")
+print("Note: This may take a while :)")
+
+mlp = MLPRegressor(random_state=1869)
+grid_search = GridSearchCV(
+    estimator=mlp,
+    param_grid=param_grid,
+    cv=3,       # 3-fold cross-validation
+    scoring='neg_mean_squared_error',
+    verbose=2,
+    n_jobs=-1   # use all CPU cores
+)
+
+t0 = time.time()
+grid_search.fit(X_train, Y_train)
+tf = time.time() - t0
+
+# Best Model Evaluation
+print(f"\nGrid Search completed in {tf:.2f} seconds")
+print(f"Best Parameters found: {grid_search.best_params_}")
+
+best_model = grid_search.best_estimator_
+print("Running predictions on Test Set with best model...")
+pred = np.clip(best_model.predict(X_test), 0, 1)
+
+# Metrics
+rmse = np.sqrt(mean_squared_error(Y_test, pred))
+mae = mean_absolute_error(Y_test, pred)
+corr = np.corrcoef(Y_test.flatten(), pred.flatten())[0, 1]
+
+print(f"Best Model RMSE: {rmse}")
+print(f"Best Model MAE: {mae}")
+print(f"Best Model Correlation: {corr}")
+
+metadata = {
+    "variables": X_vars,
+    "best_params": grid_search.best_params_,
+    "search_space_size": len(hidden_layer_combinations) * len(param_grid['activation']) * len(param_grid['solver']),
+    "rmse": rmse,
+    "mae": mae,
+    "corr": corr,
+    "training_time": tf,
+    "timestamp": time.time(),
+}
+
+# Save best model
+model_name = f"best_mlp_{int(time.time())}"
+save_model(best_model, scaler, metadata, model_name)
+print(f"Saved best model as: {model_name}")
+
+results_df = pd.DataFrame(grid_search.cv_results_)
+results_df["MSE"] = -results_df["mean_test_score"]
+results_df["RMSE"] = np.sqrt(results_df["MSE"])
+results_df = results_df.sort_values(by="RMSE")
+
+results_df.loc[results_df['rank_test_score'] == 1, "test_RMSE"] = rmse
+results_df.loc[results_df['rank_test_score'] == 1, "test_MAE"] = mae
+results_df.loc[results_df['rank_test_score'] == 1, "test_CORR"] = corr
+
+results_df.to_csv(f"multi_metadata/model_rankings_{int(time.time())}.csv", index=False)
+print("Saved rankings to model_rankings.csv")
+print(results_df.head(5)[["params", "RMSE"]])
+	\end{python}
+
+	\subsection{Empirical Model Scoring (compare\_models.py)}
+	\begin{python}
+import json, os
+
+def calc_model_score(rmse, mae, corr):
+    return (1 / rmse) + (1 / mae) + (corr * 10)
+
+dir = "multi_metadata"
+
+model_names = [v.split("_meta.json")[0] for v in os.listdir(dir)]
+model_metadata = {}
+
+for model in model_names:
+    with open(f"{dir}/{model}_meta.json", "r") as f:
+        model_metadata[model] = json.load(f)
+
+for model in model_metadata:
+    rmse = model_metadata[model]["rmse"]
+    mae = model_metadata[model]["mae"]
+    corr = model_metadata[model]["corr"]
+    
+    score = calc_model_score(rmse, mae, corr)
+    model_metadata[model]["score"] = score
+
+print(json.dumps(model_metadata, indent=4))
+	\end{python}
+
+	\newpage
+	\begin{thebibliography}{99}
+
+		\bibitem{kennicutt2014}
+		Kennicutt, M., Chown, S., Cassano, J., et al. (2014).
+		\textit{Polar research: Six priorities for Antarctic science}.
+		Nature, 512, 23-25.
+		\url{https://doi.org/10.1038/512023a}
+
+		\bibitem{annatmos}
+		Gardner, M. W., Dorling, S. R. (1998).
+		\textit{Artificial neural networks (the multilayer perceptron)—a review of applications in the atmospheric sciences}.
+		Atmospheric Environment, 32(14-15), 2627-2636.
+		\url{https://doi.org/10.1016/S1352-2310(97)00447-0}
+
+		\bibitem{annclimatechange}
+		Liu, Z., Peng, C., Xiang, W., et al. (2010).
+		\textit{Application of artificial neural networks in global climate change and ecological research: An overview}.
+		Chinese Science Bulletin, 55, 3853-3863.
+		\url{https://doi.org/10.1007/s11434-010-4183-3}
+
+		\bibitem{era5}
+		Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Horányi, A., Muñoz Sabater, \emph{et al.} (2023).
+		\textit{ERA5 hourly data on single levels from 1940 to present}.
+		Copernicus Climate Change Service (C3S) Climate Data Store.
+		\url{https://doi.org/10.24381/cds.adbb2d47}
+
+		\bibitem{parkinson2012}
+		Parkinson, C. L., Cavalieri, D. J. (2012).
+		\textit{Antarctic sea ice variability and trends, 1979-2010}.
+		The Cryosphere, 6, 871-880.
+		\url{https://doi.org/10.5194/tc-6-871-2012}
+
+		\bibitem{seaicedecline}
+		Wang, Z., Turner, J., Wu, Y., Liu, C. (2019).
+		\textit{Rapid Decline of Total Antarctic Sea Ice Extent during 2014-16 Controlled by Wind-Driven Sea Ice Drift}.
+		Journal of Climate, 32(17), 5381-5395.
+		\url{https://doi.org/10.1175/JCLI-D-18-0635.1}
+
+		\bibitem{schemm2018}
+		Schemm, S. (2018).
+		\textit{Regional trends in weather systems help explain Antarctic sea ice trends}.
+		Geophysical Research Letters, 45(13), 7165-7175.
+		\url{https://doi.org/10.1029/2018GL079109}
+
+		\bibitem{temp2}
+		Turner, J., Anderson, P., Lachlan-Cope, T. A., Colwell, S., Phillips, T., Kirchgaessner, A., \emph{et al.} (2009).
+		\textit{Record low surface air temperature at Vostok station, Antarctica}.
+		Journal of Geophysical Research: Atmospheres, 114(D24102).
+		\url{https://doi.org/10.1029/2009JD012104}
+
+		\bibitem{temp1}
+		Turner, J., Lu, H., King, J., Marshall, G. J., Phillips, T., Bannister, D., Colwell, S. (2021).
+		\textit{Extreme Temperatures in the Antarctic}.
+		Journal of Climate, 34(7), 2653-2668.
+		\url{https://doi.org/10.1175/JCLI-D-20-0538.1}
+
+		\bibitem{var200}
+		Yang, J., Xiao, C., Liu, J., Li, S., Qin, D. (2021).
+		\textit{Variability of Antarctic sea ice extent over the past 200 years}.
+		Science Bulletin, 66(23), 2394-2404.
+		\url{https://doi.org/10.1016/j.scib.2021.07.028}
+
+		\bibitem{desantis2017}
+		De Santis, A., Maier, E., Gomez, R., Gonzalez, I. (2017).
+		\textit{Antarctica, 1979-2016 sea ice extent: total versus regional trends, anomalies, and correlation with climatological variables}.
+		International Journal of Remote Sensing, 38(24), 7566-7584.
+		\url{https://doi.org/10.1080/01431161.2017.1363440}
+
+		\bibitem{jena2018}
+		Jena, B., Kumar, A., Ravichandran, M., Kern, S. (2018).
+		\textit{Mechanism of sea-ice expansion in the Indian Ocean sector of Antarctica: Insights from satellite observation and model reanalysis}.
+		PLOS ONE, 13(10), e0203222.
+		\url{https://doi.org/10.1371/journal.pone.0203222}
+
+		\bibitem{python}
+		Python Software Foundation. (2025).
+		\textit{Python Language Reference, version 3.13.7}.
+		\url{http://www.python.org}
+
+		\bibitem{sklearn}
+		Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., \emph{et al.} (2011).
+		\textit{Scikit-Learn: Machine Learning in Python}.
+		Journal of Machine Learning Research, 12, 2825-2830.
+		\url{http://jmlr.org/papers/v12/pedregosa11a.html}
+
+		\bibitem{github}
+		Goswami, M. (2025).
+		\textit{megz15/mlp-sic-pred: MLP Neural Network for Antarctic Sea-Ice Concentration Prediction}.
+		GitHub.
+		\url{https://github.com/megz15/mlp-sic-pred}
+
+	\end{thebibliography}
 \end{document}
