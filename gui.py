@@ -42,6 +42,7 @@ def run_training():
 
         log("Loading dataset...")
         ds = xr.open_dataset("data_2014-2024.nc")
+        ds = ds.sel(latitude=slice(-55, -75))
 
         selected_vars = [var for var in X_vars.keys() if dpg.get_value(f"chk_{var}")]
         if len(selected_vars) == 0:

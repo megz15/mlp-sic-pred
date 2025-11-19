@@ -2,3 +2,4 @@
 models/*
 scalers/*
 metadata/*
+tmp/*
