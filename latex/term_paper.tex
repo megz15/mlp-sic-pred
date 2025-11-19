@@ -1,0 +1,184 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{matlab-prettifier}
+\usepackage{subcaption}
+\usepackage{float}
+
+\hypersetup{
+    colorlinks,
+    linkcolor={blue!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\pagestyle{fancy}
+
+\title{
+	\textbf{Application of Multi-Linear Perceptron Neural Network for Predicting Antarctic Sea-Ice Concentration using Meteorological Variables}\\
+	\large Term Paper
+}
+\author{
+	Meghraj Goswami\\
+	2022A2B41869H\\
+	Department of Civil Engineering, Department of Mathematics\\
+	BITS Pilani, Hyderabad Campus
+}
+\date{\today}
+
+\begin{document}
+	
+	% \maketitle
+
+	\begin{titlepage}
+		\centering
+		\vspace*{1cm}
+		
+		\large A Term Paper On \\[0.5cm]
+		
+		\LARGE \textbf{Application of Multi-Linear \\ Perceptron Neural Network for \\ Predicting Antarctic Sea-Ice Concentration using Meteorological Variables} \\[1cm]
+		
+		\large By \\[0.5cm]
+		\Large \textbf{Meghraj Goswami} \\[0.2cm]
+		\large 2022A2B41869H \\
+		
+		\vfill
+		
+		\large Under the supervision of \\[0.5cm]
+		\large \textbf{Prof. Jagadeesh Anmala}
+		
+		\vfill
+		
+		\large Submitted in Partial Fulfilment of the Requirements of \\[0.5cm]
+		\large \textbf{CE F417: Application of AI in Civil Engineering} \\[0.5cm]
+		
+		\vfill
+		
+		\includegraphics[width=0.3\textwidth]{logo.png}\\[1cm]
+		
+		\large \textbf{BIRLA INSTITUTE OF TECHNOLOGY AND SCIENCE PILANI (RAJASTHAN)} \\[0.5cm]
+		\large \textbf{HYDERABAD CAMPUS} \\[1cm]
+		
+		\large (November 2025)
+	\end{titlepage}
+
+	\section*{Acknowledgements}
+
+	I would like to express my sincere gratitude to Professor Jagadeesh Anmala, for his guidance, support, and encouragement throughout the semester. His expertise and insights have been instrumental in enhancing my understanding of the subject matter.
+
+	\newpage
+
+	\begin{abstract}
+		This project uses feedforward Multi-Layer Perceptron (MLP) Neural Network models for forecasting Sea-Ice concentration (SIC) using meteorological variables derived from ERA5 reanalysis: sea-surface temperature (SST), 2m air temperature (T2M), 10m u and v wind components (U10, V10) and mean sea-level pressure (MSL). The MLP models are trained using various combinations of input variables and model hyperparameters. The performance of the models is evaluated using statistical metrics such as Root Mean Square Error (RMSE), Mean Absolute Error (MAE), and Coefficient of Determination ($R\textsuperscript{2}$). This project highlights the potential of MLP Neural Networks in accurately predicting SIC, which is crucial for understanding climate dynamics all over the world.
+	\end{abstract}
+
+	\newpage
+	\tableofcontents
+
+	\newpage
+	\section{Introduction}
+	\subsection{Background}
+	Sea-ice plays an important role in the global climate system, influencing heat exchange, ocean circulation and weather patterns. Sea-Ice concentration in Antarctica varies seasonally, reaching its maximum in the Antarctic winter (July to September) and its minimum in the Antarctic summer (January to March). This variation is strongly influenced in non-linear ways by various meteorological variables, including temperature (SST), wind patterns (U10, V10), and atmospheric pressure (MSL). Accurate prediction of SIC is crucial for understanding climate dynamics and policy-making related to climate change.
+	\\\\ Traditional methods for predicting SIC often rely on physical models that can be computationally expensive and require extensive calibration, and may not capture the complex non-linear relationships between SIC and meteorological variables. Moreover, the accuracy of these models can be limited by the resolution and quality of input data.
+	\\\\ On the other hand, machine learning techniques, particularly neural networks, are known to capture complex patterns in data. Multi-Layer Perceptron (MLP) Neural Networks are a type of feedforward artificial neural network (ANN) that can model non-linear relationships between input and output variables. MLPs consist of multiple layers of interconnected neurons that can learn from large datasets through iterative training and optimization. Due to this, they are generally well-suited for cases where the input data is not at par with the quality or resolution required by physical models.
+	\\\\ This project aims to explore the application of MLP Neural Networks for predicting Antarctic Sea-Ice concentration using meteorological variables as inut variables derived from ERA5 reanalysis data. The performance of the MLP models are evaluated using various statistical metrics, and the results are compared to gauge the relative effectiveness of the models.
+
+	\newpage
+
+	\subsection{Study Area}
+	The study area for this project is the Antarctic region, specifically the Southern Ocean surrounding the continent of Antarctica. Antarctica occupies an area of about 14 million square kilometers, which is mostly covered by 29 million cubic kilometers of ice - about 90\% of the world's ice and 80\% of its fresh water.
+	\\\\ The Antarctic sea-ice cover is typically divided into five sectors: the Ross Sea, the Weddell Sea, the Indian Ocean sector, the West Pacific sector and the Bellingshausen-Amundsen Seas. Each sector exhibits distinct sea-ice characteristcs due to variations in local meteorological and oceanographic conditions.
+	\\\\ The weather in Antarctica is characterized by high-speed katabatic winds, which are created due to cold and dense air blowing downhill from the polar plateau. These winds influence formation and distribution of sea-ice in the surrounding Southern Ocean.
+	\\\\ Antarctica also experiences extreme temperature patterns due to being plunged into darkness during the Antarctic winter and experiencing continuous sunlight during the Antarctic summer. Depending on the region, temperatures in Antarctica fluctuate between -80°C in winter to 10°C in summer. Precipitation is generally low, with most of it falling as snow.
+	\\\\ Atmospheric pressure patterns in Antarctica also play a significant role in influencing sea-ice dynamics. The mainland is usually surrounded by a low-pressure belt, while the interior experiences high-pressure, creating conditions for the formation of the characteristic katabatic winds.
+
+	\newpage
+	\section{Literature Review}
+
+	\newpage
+	\section{Data and Methodology}
+	\subsection{Data Sources}
+	The data used in this project is taken from the ERA5 reanalysis dataset, which is maintained by the European Centre for Medium-Range Weather Forecasts (ECMWF). The dataset uses historical meteorological observations and weather prediction models to generate comprehensive data, from 1940 to the present. It has a spatial resolution of 0.25° x 0.25° and a temporal resolution of 1 hour, although a monthly frequency has been chosen for this project. This makes it suitable for studying climate patterns and trends.
+	\\\\ The specific meteorological variables used in this project are:
+	\begin{itemize}
+		\item Sea-Surface Temperature (SST)
+		\item 2m Air Temperature (T2M)
+		\item 10m U Wind Component (U10)
+		\item 10m V Wind Component (V10)
+		\item Mean Sea-Level Pressure (MSL)
+	\end{itemize}
+	The target variable for prediction is the Sea-Ice Concentration (SIC) in the Antarctic Southern ocean region (latitude range -55° to -75°).
+	\\\\ The dataset spans a decade from January 2014 to December 2024, incorporating seasonal and inter-annual variability.
+
+	\subsection{Data Preprocessing}
+	In its raw form, the ERA5 dataset contains missing values, outliers and inconsistencies that need to be taken care of before training the MLP models. The following preprocessing steps are applied:
+	\begin{itemize}
+		\item \textbf{Handling Missing Values:} Missing values in the dataset are handled using imputing, interpolation and removal of records with excessive missing data. The mean of data points is used for imputation.
+		\item \textbf{Train-Test Splitting:} The dataset is split into training (70\%) and testing (30\%) sets. The training set is used to train the MLP models, while the testing set is used to evaluate their performance.
+		\item \textbf{Standardization:} The input variables are standardized, or in other words they are rescaled to have a mean of 0 and a standard deviation of 1. This ensures that all input variables contribute equally when training the model.
+	\end{itemize}
+
+	\subsection{MLP Neural Network Architecture}
+	A Multi-Layer Perceptron (MLP) Neural Network is a type of feedforward artificial neural network composed of an input layer, one or more hidden layers, and an output layer. Each layer consists of multiple neurons, and neurons in one layer are connected to those in the next layer through weighted connections. Backpropagation is used to train the network by adjusting the weights based on the error difference between predicted and actual outputs. MLPs are widely used for supervised learning problems, such as regression and classification.
+	\\\\ The MLP Neural Network architecture used in this project comprises the following components:
+	\begin{itemize}
+		\item \textbf{Input Layer:} The input layer consists of neurons corresponding to the number of meteorological variables used as input features (maximum of 5 in this case).
+		\item \textbf{Hidden Layers:} The MLP architecture includes a number of hidden layers, each with varying number of neurons. The number of hidden layers and neurons per layer are hyperparameters that are defined by the user and can be tuned for optimal performance.
+		\item \textbf{Output Layer:} The output layer consists of a single neuron that predicts the Sea-Ice Concentration (SIC) value.
+		\item \textbf{Learning Rate:} The learning rate (alpha) controls the step size while updating the model weights during training. A suitable learning rate is chosen to ensure convergence.
+		\item \textbf{Activation Functions:} Non-linear activation functions such as ReLU (Rectified Linear Unit), Sigmoidal or Hyperbolic Tangent are used in the hidden layers to introduce non-linearity into the model.
+		\item \textbf{Loss Function:} Mean Squared Error (MSE) is used as the loss function to measure the difference between predicted and actual SIC values during training.
+		\item \textbf{Optimization Algorithm:} The Adaptive Moment Estimation (Adam) optimizer is used to update the weights of the network during training. Other optimizers like Stochastic Gradient Descent (SGD) can also be used.
+	\end{itemize}
+
+	\subsection{Model Training and Evaluation}
+	The MLP Neural Network models are trained using the preprocessed training dataset. The training process involves multiple iterations, or epochs, where the model iteratively perturbs and adjusts its weights to minimize the output of the loss function. The following steps are involved in model training and evaluation:
+	\\\\ The trained models are evaluated using the testing dataset. The following statistical metrics are used to assess model performance:
+	\begin{itemize}
+		\item Root Mean Square Error (RMSE)
+		\item Mean Absolute Error (MAE)
+		\item Coefficient of Determination ($R\textsuperscript{2}$)
+	\end{itemize}
+	The performance of different MLP models is compared based on the evaluation metrics using the following formula:
+	\begin{equation*}
+		\dfrac{1}{\textit{RMSE}} + \dfrac{1}{\textit{MAE}} + 10\textit{R}\textsuperscript{2}
+	\end{equation*}
+
+	\newpage
+	\section{Results}
+	Out of multiple MLP models trained using different hyperparameter configurations, the best performing model has:
+	\begin{itemize}
+		\item Input Variables: SST, T2M, U10, V10, MSL
+		\item Hidden Layers: \textbf{TBD}
+		\item Activation Function: ReLU
+		\item Optimization Scheme: Adam
+		\item Learning Rate: 0.001
+		\item Epochs: \textbf{TBD}
+	\end{itemize}
+	The performance metrics for the best model on the testing dataset are as follows:
+	\begin{itemize}
+		\item Root Mean Square Error (RMSE): \textbf{TBD}
+		\item Mean Absolute Error (MAE): \textbf{TBD}
+		\item Coefficient of Determination ($R\textsuperscript{2}$): \textbf{TBD}
+	\end{itemize}
+	The results indicate that the MLP Neural Network is capable of accurately predicting Antarctic Sea-Ice Concentration using meteorological variables. The low RMSE and MAE values suggest that the model has a good fit to the data, while the high $R\textsuperscript{2}$ value indicates that a significant portion of the variance in SIC is explained by the input variables.
+
+	\newpage
+	\section{Discussion}
+
+	\newpage
+	\section{Conclusion}
+
+	\newpage
+	\section{Bibliography}
+	\begin{itemize}
+		
+		\item Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Horányi, A., Muñoz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Thépaut, J-N. (2023). \textit{ERA5 hourly data on single levels from 1940 to present}. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). \url{https://doi.org/10.24381/cds.adbb2d47}
+		
+		\item Jena B, Kumar A, Ravichandran M, Kern S (2018). \textit{Mechanism of sea-ice expansion in the Indian Ocean sector of Antarctica: Insights from satellite observation and model reanalysis}. PLoS ONE 13(10): e0203222. \url{ https://doi.org/10.1371/journal.pone.0203222}
+
+	\end{itemize}
+\end{document}
