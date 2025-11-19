@@ -1,5 +1,8 @@
 *.nc
 models/*
+multi_models/*
 scalers/*
+multi_scalers/*
 metadata/*
+multi_metadata/*
 tmp/*
