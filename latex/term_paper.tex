@@ -15,7 +15,7 @@
 \pagestyle{fancy}
 
 \title{
-	\textbf{Application of Multi-Linear Perceptron Neural Network for Predicting Antarctic Sea-Ice Concentration using Meteorological Variables}\\
+	\textbf{Application of Multi-Layer Perceptron Neural Network for Predicting Antarctic Sea-Ice Concentration using Meteorological Variables}\\
 	\large Term Paper
 }
 \author{
@@ -36,7 +36,7 @@
 		
 		\large A Term Paper On \\[0.5cm]
 		
-		\LARGE \textbf{Application of Multi-Linear \\ Perceptron Neural Network for \\ Predicting Antarctic Sea-Ice Concentration using Meteorological Variables} \\[1cm]
+		\LARGE \textbf{Application of Multi-Layer \\ Perceptron Neural Network for \\ Predicting Antarctic Sea-Ice Concentration using Meteorological Variables} \\[1cm]
 		
 		\large By \\[0.5cm]
 		\Large \textbf{Meghraj Goswami} \\[0.2cm]
@@ -68,7 +68,8 @@
 
 	\newpage
 	\begin{abstract}
-		This project uses feedforward Multi-Layer Perceptron (MLP) Neural Network models for forecasting Sea-Ice concentration (SIC) using meteorological variables derived from ERA5 reanalysis: sea-surface temperature (SST), 2m air temperature (T2M), 10m u and v wind components (U10, V10) and mean sea-level pressure (MSL). The MLP models are trained using various combinations of input variables and model hyperparameters. The performance of the models is evaluated using statistical metrics such as Root Mean Square Error (RMSE), Mean Absolute Error (MAE) and Coefficient of Correlation (R). This project highlights the potential of MLP Neural Networks in accurately predicting SIC, which is crucial for understanding climate dynamics all over the world.
+		This project uses feedforward Multi-Layer Perceptron (MLP) Neural Network models for predicting Sea-Ice concentration (SIC) using five key meteorological variables derived from ERA5 reanalysis: sea-surface temperature (SST), 2m air temperature (T2M), 10m u and v wind components (U10, V10) and mean sea-level pressure (MSL). Motivated by the limitations of purely physics-based sea-ice models, the work aims to gauge whether simple neural architectures can capture large-scale sea-ice variability. The MLP models are trained using various combinations of input variables and model hyperparameters, and the performance of the models is evaluated using statistical metrics such as Root Mean Square Error (RMSE), Mean Absolute Error (MAE) and Coefficient of Correlation (R).
+		\\\\ The objective of the project is to build and optimize a parsimonious MLP model capable of learning the relationship between atmospheric and oceaning variables and sea-ice concentration, using an exhaustive search over possible network configurations in the defined hyperparameter space. It aims to highlight the potential of MLP models in optimally predicting SIC, which is important for understanding climate dynamics all over the world.
 	\end{abstract}
 
 	\newpage
@@ -84,10 +85,16 @@
 	\newpage
 	\section{Study Area and Data}
 	\subsection{Study Area}
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=0.75\textwidth]{antarctic_map.jpg}
+		\caption{Map of Antarctica showing the 5 sectors}
+		\label{fig:map}
+	\end{figure}
 	The study area for this project is the Antarctic region, specifically the Southern Ocean surrounding the continent of Antarctica. Antarctica occupies an area of about 14 million square kilometers, which is mostly covered by 29 million cubic kilometers of ice - about 90\% of the world's ice and 80\% of its fresh water.
-	\\\\ The Antarctic sea-ice cover is typically divided into five sectors: the Ross Sea, the Weddell Sea, the Indian Ocean sector, the West Pacific sector and the Bellingshausen-Amundsen Seas. Each sector exhibits distinct sea-ice characteristcs due to variations in local atmospheric and oceanic conditions \cite{parkinson2012}.
+	\\\\ The Antarctic sea-ice cover is typically divided into five sectors, as depicted in Figure \ref{fig:map}: the Ross Sea, the Weddell Sea, the Indian Ocean sector, the West Pacific sector and the Bellingshausen-Amundsen Seas. Each sector exhibits distinct sea-ice characteristcs due to variations in local atmospheric and oceanic conditions \cite{parkinson2012}.
 	\\\\ The weather in Antarctica is characterized by high-speed katabatic winds, which are created due to cold and dense air blowing downhill from the polar plateau. These winds influence formation and distribution of sea-ice in the surrounding Southern Ocean \cite{seaicedecline} \cite{schemm2018}.
-	\\\\ Antarctica also experiences extreme temperature patterns due to being plunged into darkness during the Antarctic winter and experiencing continuous sunlight during the Antarctic summer \cite{temp2}. Depending on the region, temperatures in Antarctica fluctuate between -80°C in winter to 10°C in summer \cite{temp1}. Precipitation is generally low, with most of it falling as snow.
+	\\\\ Antarctica also experiences extreme temperature patterns due to the polar night during the Antarctic winter and experiencing continuous sunlight during the Antarctic summer \cite{temp2}. Depending on the region, temperatures in Antarctica fluctuate between -80°C in winter to 10°C in summer \cite{temp1}. Precipitation is generally low, with most of it falling as snow.
 	\\\\ Atmospheric pressure patterns in Antarctica also play a significant role in influencing sea-ice dynamics. The mainland is usually surrounded by a low-pressure belt, while the interior experiences high-pressure, creating conditions for the formation of the characteristic katabatic winds \cite{seaicedecline}.
 	\\\\ The seasons in Antarctica are opposite to those in the Northern Hemisphere, and are categorized as follows \cite{parkinson2012}:
 	\begin{itemize}
@@ -97,7 +104,6 @@
 		\item \textbf{Spring:} October to December
 	\end{itemize}
 
-	\newpage
 	\subsection{Data Source}
 	The data used in this project is taken from the ERA5 reanalysis dataset, which is maintained by the European Centre for Medium-Range Weather Forecasts (ECMWF) \cite{era5}. The dataset uses historical meteorological observations and weather prediction models to generate comprehensive data, from 1940 to the present. It has a spatial resolution of 0.25° x 0.25° and a temporal resolution of 1 hour, although a monthly frequency has been chosen for this project. This makes it suitable for studying climate patterns and trends.
 	\\\\ The specific variables used in this project are:
@@ -108,7 +114,8 @@
 		\item 10m V Wind Component (V10)
 		\item Mean Sea-Level Pressure (MSL)
 	\end{itemize}
-	The target variable for prediction is the Sea-Ice Concentration (SIC) in the Antarctic Southern ocean region:
+	The target variable for prediction is the Sea-Ice Cover or Sea-Ice Concentration (SIC), a dimensionless quantity representing the fraction of a given area covered by sea-ice, ranging from 0 (no ice) to 1 (complete ice cover). The SIC data is also derived from the ERA5 reanalysis dataset.
+	\\\\ The geographical extent of the dataset used in this project is as follows:
 	\begin{itemize}
 		\item North: -55°
 		\item South: -75°
@@ -130,20 +137,19 @@
 
 	\newpage
 	\section{Methods and Methodology}
-	\subsection{Tools and Software}
 	The following tools and software are used in this project:
 	\begin{itemize}
-		\item \textbf{Primary language:} Python 3.13.7 \cite{python}
+		\item \textbf{Scripting:} Python 3.13.7 \cite{python}
 		\item \textbf{Neural network library:} scikit-learn (MLPRegressor) \cite{sklearn}
 		\item \textbf{Data handling:} xarray, NumPy
 		\item \textbf{Preprocessing:} StandardScaler, SimpleImputer
 		\item \textbf{Hyperparameter tuning:} GridSearchCV
 		\item \textbf{Model serialization:} joblib
 		\item \textbf{GUI:} DearPyGUI
-		\item \textbf{Dataset format:} NetCDF (ERA5)
+		\item \textbf{Dataset format:} NetCDF
 	\end{itemize}
-	All computations were performed on a Linux 6.17.8 system running Arch Linux, with multi-core CPU acceleration enabled during grid search. The Python codebase has been added to a public GitHub repository \cite{github}, as well as in the Appendix section of this report.
-	\\\\ A graphical user interface (GUI) has also been developed using DearPyGUI to enable easy and interactive experimentation with different hyperparameter configurations, without modifying the codebase directly.
+	All computations are performed on a Linux 6.17.8 system running Arch Linux, with multi-core CPU acceleration enabled during grid search. The Python codebase has been added to a public GitHub repository \cite{github}, as well as in the Appendix section of this report.
+	\\\\ A graphical user interface (GUI) has also been developed using DearPyGUI to enable easy and interactive experimentation with different hyperparameter configurations, without modifying the codebase directly. A screenshot of the GUI is shown in Figure \ref{fig:gui}.
 	\begin{figure}[h!]
 		\centering
 		\includegraphics[width=0.8\textwidth]{gui.png}
@@ -160,7 +166,13 @@
 	\end{itemize}
 
 	\subsection{MLP Neural Network Architecture}
-	A Multi-Layer Perceptron (MLP) Neural Network is a type of feedforward artificial neural network composed of an input layer, one or more hidden layers, and an output layer. Each layer consists of multiple neurons, and neurons in one layer are connected to those in the next layer through weighted connections. Backpropagation is used to train the network by adjusting the weights based on the error difference between predicted and actual outputs. MLPs are widely used for supervised learning problems, such as regression and classification.
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=0.75\textwidth]{mlp.png}
+		\caption{Multi-Layer Perceptron Neural Network Architecture}
+		\label{fig:mlp}
+	\end{figure}
+	A Multi-Layer Perceptron (MLP) Neural Network (Figure \ref{fig:mlp}) is a type of feedforward artificial neural network composed of an input layer, one or more hidden layers, and an output layer. Each layer consists of multiple neurons, and neurons in one layer are connected to those in the next layer through weighted connections. Backpropagation is used to train the network by adjusting the weights based on the error difference between predicted and actual outputs. MLPs are widely used for supervised learning problems, such as regression and classification.
 	\\\\ The MLP Neural Network architecture used in this project comprises the following components:
 	\begin{itemize}
 		\item \textbf{Input Layer:} The input layer consists of neurons corresponding to the number of meteorological variables used as input features (maximum of 5 in this case).
@@ -180,14 +192,14 @@
 		\item Mean Absolute Error (MAE)
 		\item Coefficient of Correlation (R)
 	\end{itemize}
-	The performance of different MLP models is also empirically compared based on the evaluation metrics using the following formula:
-	\begin{equation}
-		\frac{1}{RMSE} + \frac{1}{MAE} + 10R
-	\end{equation}
+	% The performance of different MLP models is also empirically compared based on the evaluation metrics using the following formula:
+	% \begin{equation}
+	% 	\frac{1}{RMSE} + \frac{1}{MAE} + 10R
+	% \end{equation}
 
 	\newpage
 	\section{Results}
-	To fine-tune the optimal hyperparameters for the MLP Neural Network, an exhaustive grid search was conducted over a user-defined hyperparameter space. The hyperparameters considered in the grid search include:
+	To fine-tune the optimal hyperparameters for the MLP Neural Network, an exhaustive grid search is conducted over a user-defined hyperparameter space. The hyperparameters considered in the grid search include:
 
 	\begin{itemize}
 		\item Input Variables: SST, T2M, U10, V10, MSL
@@ -204,7 +216,7 @@
 	For the one-layer networks, a total of $4*3*2*3 = 72$ candidate models are tested, amounting to 216 training runs with 3-fold cross-validation. For the two-layer networks, a total of $16*3*2*3 = 288$ candidate models are tested, amounting to 864 training runs with 3-fold cross-validation.
 	
 	\subsection{Best One-Layer Model}
-	Out of the defined hyperparameter space, the best-performing one-layer MLP model based on the evaluation metrics had the following hyperparameters:
+	Out of the defined hyperparameter space, the best-performing one-layer MLP model based on the evaluation metrics has the following hyperparameters:
 	\begin{itemize}
 		\item Input Variables: SST, T2M, U10, V10, MSL
 		\item Architecture: One hidden layer with 4 Neurons
@@ -224,7 +236,7 @@
 	\end{itemize}
 
 	\subsection{Best Two-Layer Model}
-	Out of the defined hyperparameter space, the best-performing two-layer MLP model based on the evaluation metrics had the following hyperparameters:
+	Out of the defined hyperparameter space, the best-performing two-layer MLP model based on the evaluation metrics has the following hyperparameters:
 	\begin{itemize}
 		\item Input Variables: SST, T2M, U10, V10, MSL
 		\item Architecture: Two hidden layers with 5 Neurons each
@@ -245,14 +257,14 @@
 
 	\newpage
 	\section{Discussion}
-	The results obtained from the grid searches indicate that both the best one-layer and two-layer MLP models constrained in the defined hyperparameter space performed comparably well in predicting Antarctic SIC using meteorological variables. The RMSE and MAE values for both models are very similar, with the one-layer model slightly outperforming the two-layer model in terms of RMSE, while the two-layer model had a slightly better MAE. The R values for both models are also very close, indicating that both models explain a significant portion of the variance in the SIC data.
+	The results obtained from the grid searches indicate that both the best one-layer and two-layer MLP models constrained in the defined hyperparameter space performed comparably well in predicting Antarctic SIC using meteorological variables. The RMSE and MAE values for both models are very similar, with the one-layer model slightly outperforming the two-layer model in terms of RMSE, while the two-layer model has a slightly better MAE. The R values for both models are also very close, indicating that both models explain a significant portion of the variance in the SIC data.
 	\\\\ The choice of activation function (TanH) and optimization scheme (SGD) appears to be effective for this specific problem, as both models utilized these configurations. The learning rates chosen for the best models (0.005 for one-layer and 0.001 for two-layer) also seem to have contributed positively to the training process.
 	\\\\ The marginal differences in performance metrics suggest that increasing the complexity of the model by adding an additional hidden layer did not lead to a significant improvement. Therefore, guided by the principle of parsimony, the simpler one-layer network is the preferred model, and is termed a parsimonious model. This is likely because the relationship between the input variables and SIC is not complex enough to warrant a higher dimensional network, or the additional layer led to overfitting on the training data.
-	\\\\ Overall, both models demonstrate the capability of MLP Neural Networks in capturing the non-linear relationships between input variables and the target. However, with near identical performane, the parsimonious model (the one-layer network) is preferred for the balance between simplicity and predictive accuracy for this specific application.
+	\\\\ Overall, both models demonstrate the capability of MLP Neural Networks in capturing the non-linear relationships between input variables and the target. However, with near identical performance, the parsimonious model (the one-layer network) is preferred for the balance between simplicity and predictive accuracy for this specific application.
 
 	\newpage
 	\section{Conclusion}
-	This project explored the application of MLP Neural Networks for predicting Antarctic SIC using five key meteorological variables derived from ERA5 reanalysis data. An exhaustive grid search was conducted over a defined hyperparameter space to identify the best-performing one-layer and two-layer MLP models.
+	This project explored the application of MLP Neural Networks for predicting Antarctic SIC using five key meteorological variables derived from ERA5 reanalysis data. An exhaustive grid search is conducted over a defined hyperparameter space to identify the best-performing one-layer and two-layer MLP models.
 	\\\\ The best performing models used:
 	\begin{itemize}
 		\item Hyperbolic Tangent Activation Function
@@ -512,7 +524,8 @@ def run_training():
             solver=optimization,
             learning_rate_init=alpha,
             max_iter=max_iter,
-            verbose=True
+            verbose=True,
+			random_state=1869
         )
 
         # Train
@@ -883,4 +896,5 @@ print(json.dumps(model_metadata, indent=4))
 		\url{https://github.com/megz15/mlp-sic-pred}
 
 	\end{thebibliography}
+	\addcontentsline{toc}{section}{References}
 \end{document}
