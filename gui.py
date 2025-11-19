@@ -91,7 +91,8 @@ def run_training():
             solver=optimization,
             learning_rate_init=alpha,
             max_iter=max_iter,
-            verbose=True
+            verbose=True,
+            random_state=1869
         )
 
         # Train
@@ -158,7 +159,7 @@ with dpg.window(tag="Sea-Ice Prediction MLP"):
     dpg.add_separator()
 
     dpg.add_text("Model (hyper)parameters:")
-    dpg.add_input_text(label="Hidden layer perceptrons (comma separated)", default_value="5,5,5", tag="lst_hidden_layers")
+    dpg.add_input_text(label="Hidden layer perceptrons (comma separated)", default_value="5,5", tag="lst_hidden_layers")
     dpg.add_combo(activation_fns, label="Activation", default_value=activation_fns[0], tag="activation_combo")
     dpg.add_combo(optimization_fns, label="Optimization", default_value=optimization_fns[0], tag="optimization_combo")
     dpg.add_input_float(label="Learning Rate (alpha)", default_value=0.001, tag="alpha", step=0.001)

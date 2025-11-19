@@ -1,4 +1,4 @@
-import xarray as xr, numpy as np
+import xarray as xr, numpy as np, pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.neural_network import MLPRegressor
@@ -85,7 +85,7 @@ print(f"\nGenerated {len(hidden_layer_combinations)} combinations to test.")
 param_grid = {
     'hidden_layer_sizes': hidden_layer_combinations,
     'activation': ["relu", "tanh", "logistic"],
-    'solver': ["adam", "sgd"],
+    'solver': ["adam", "sgd"], # , "lbfgs"
     'learning_rate_init': [0.001, 0.005, 0.01],
     'max_iter': [200]
 }
@@ -139,3 +139,16 @@ metadata = {
 model_name = f"best_mlp_{int(time.time())}"
 save_model(best_model, scaler, metadata, model_name)
 print(f"Saved best model as: {model_name}")
+
+results_df = pd.DataFrame(grid_search.cv_results_)
+results_df["MSE"] = -results_df["mean_test_score"]
+results_df["RMSE"] = np.sqrt(results_df["MSE"])
+results_df = results_df.sort_values(by="RMSE")
+
+results_df.loc[results_df['rank_test_score'] == 1, "test_RMSE"] = rmse
+results_df.loc[results_df['rank_test_score'] == 1, "test_MAE"] = mae
+results_df.loc[results_df['rank_test_score'] == 1, "test_CORR"] = corr
+
+results_df.to_csv(f"multi_metadata/model_rankings_{int(time.time())}.csv", index=False)
+print("Saved rankings to model_rankings.csv")
+print(results_df.head(5)[["params", "RMSE"]])

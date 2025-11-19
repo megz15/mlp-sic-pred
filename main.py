@@ -10,13 +10,13 @@ def flatten(var):
     return var.values.reshape(len(var.valid_time), -1)
 
 def save_model(model, scaler, metadata, name):
-    if not os.path.exists("multi_models"): os.makedirs("multi_models")
-    if not os.path.exists("multi_metadata"): os.makedirs("multi_metadata")
-    if not os.path.exists("multi_scalers"): os.makedirs("multi_scalers")
+    if not os.path.exists("models"): os.makedirs("models")
+    if not os.path.exists("metadata"): os.makedirs("metadata")
+    if not os.path.exists("scalers"): os.makedirs("scalers")
     
-    joblib.dump(model, f"multi_models/{name}_model.pkl")
-    joblib.dump(scaler, f"multi_scalers/{name}_scaler.pkl")
-    with open(f"multi_metadata/{name}_meta.json", "w") as f:
+    joblib.dump(model, f"models/{name}_model.pkl")
+    joblib.dump(scaler, f"scalers/{name}_scaler.pkl")
+    with open(f"metadata/{name}_meta.json", "w") as f:
         json.dump(metadata, f, indent=4)
     
     print(f"Model, scaler and metadata saved for {name}")
@@ -68,8 +68,8 @@ X_test  = scaler.transform(X_test)
 # MLP Model parameter ranges
 
 hidden_layers = []
-activation = activation_fns
-optimization = optimization_fns
+activation = activation_fns[0]
+optimization = optimization_fns[0]
 alpha = 0.001
 max_iter = 200
 
@@ -94,7 +94,8 @@ model = MLPRegressor(
     solver=optimization,
     learning_rate_init=alpha,
     max_iter=max_iter,
-    verbose=True
+    verbose=True,
+    random_state=1869
 )
 
 # Train
